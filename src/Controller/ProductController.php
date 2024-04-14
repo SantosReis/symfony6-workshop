@@ -7,9 +7,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+#[Route('/products', name: 'products_')]
 class ProductController extends AbstractController
 {
-    #[Route('/products', name: 'product', methods: ['GET', 'HEAD'])]
+    #[Route('/', name: 'all', methods: ['GET', 'HEAD'])]
     public function index(): Response
     {
         return $this->render('product/index.html.twig', [
@@ -17,7 +18,7 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/product/{slug}', name: 'product_name')]
+    #[Route('/{slug}', name: 'name')]
     public function show(Product $product): Response
     {
         return new Response('Displaying product: ' . $product->getName());
