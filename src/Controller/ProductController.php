@@ -17,7 +17,7 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/product/{id}', name: 'product_name')]
+    #[Route('/product/{slug}', name: 'product_name')]
     public function show(Product $product): Response
     {
         return new Response('Displaying product: ' . $product->getName());
