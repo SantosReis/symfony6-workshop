@@ -13,10 +13,10 @@ class ProductController extends AbstractController
     #[Route('/', name: 'all', methods: ['GET', 'HEAD'])]
     public function index(): Response
     {
-        return $this->redirectToRoute('products_inventory', ['id' => '1']);
-        // return $this->render('product/index.html.twig', [
-        //     'controller_name' => 'ProductController',
-        // ]);
+        // return $this->redirectToRoute('products_inventory', ['id' => '1']);
+        return $this->render('product/index.html.twig', [
+            'controller_name' => 'ProductController',
+        ]);
     }
 
     // #[Route('/{slug}', name: 'name')]
