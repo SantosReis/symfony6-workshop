@@ -16,7 +16,7 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/product/{category}', name: 'product_name', requirements: ['category' => 'old|new'])]
+    #[Route('/product/{category<old|new>}', name: 'product_name')]
     public function show(string $category): Response
     {
         return new Response('Displaying product: ' . $category);
