@@ -2,9 +2,10 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Product;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ProductController extends AbstractController
 {
@@ -16,10 +17,10 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/product/{category<old|new>}', name: 'product_name')]
-    public function show(string $category): Response
+    #[Route('/product/{id}', name: 'product_name')]
+    public function show(Product $product): Response
     {
-        return new Response('Displaying product: ' . $category);
+        return new Response('Displaying product: ' . $product->getName());
         // return $this->render('product/index.html.twig', [
         //     'controller_name' => 'ProductController',
         // ]);
