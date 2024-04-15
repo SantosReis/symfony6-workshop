@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class UpdateStockCommand extends Command
 {
     protected string $projectDir;
+    protected $entityManager;
     public function __construct($projectDir, EntityManagerInterface $entityManager)
     {
         parent::__construct();
@@ -42,17 +43,27 @@ class UpdateStockCommand extends Command
     {
         $processDate = $input->getArgument('process_date');
 
+        $markup = ($input->getArgument('markup') / 100) + 1;
+
         //Convert csv file content into iterable php
         $supplierProducts = $this->getCsvRowsAsArrays($processDate);
         // dd($supplierProducts);
 
+        /** var StockItemRepository $stockItemRepo  */
         $stockItemRepo = $this->entityManager->getRepository(StockItem::class);
 
         //Loop over records
         foreach ($supplierProducts as $supplierProduct){
+            
             //Update IF matching records found in DB
-            $existingStockItem = $stockItemRepo->findBy(['itemNumber' => $supplierProduct['item_number']]);
-            dd($existingStockItem);
+            /** var StockItem $existingStockItem  */
+            if($existingStockItem = $stockItemRepo->findOneBy(['itemNumber' => $supplierProduct['item_number']])){
+                // dump($existingStockItem);
+                $existingStockItem->setSupplierCost($supplierProduct['cost']);
+                $existingStockItem->setPrice($supplierProduct['cost'] * $markup);
+            }
+
+            // dd($existingStockItem);
             //Create new records if matching records not found in the DB
         }
 
