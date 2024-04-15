@@ -20,6 +20,7 @@ class EmailController extends AbstractController
             ->from($appEmail)
             ->to(new Address('email@example.com', 'Gary'))
             ->subject('Your order has been placed')
+            ->textTemplate('email/order-confirmation.text.twig')
             ->htmlTemplate('email/order-confirmation.html.twig')
             ->attachFromPath($publicDir . '/pdf/test.pdf')
             ->context([
