@@ -51,23 +51,29 @@ class UpdateStockCommand extends Command
 
         $stockItemRepo = $this->entityManager->getRepository(StockItem::class);
 
+        $existingCount = 0;
+        $newCount = 0;
+
         //Loop over records
         foreach ($supplierProducts as $supplierProduct){
             
             //Update IF matching records found in DB
             if($existingStockItem = $stockItemRepo->findOneBy(['itemNumber' => $supplierProduct['item_number']])){
                 $this->updateStockItem($existingStockItem, $supplierProduct, $markup);
+
+                $existingCount++;
                 continue;
             }
 
             //Create new records if matching records not found in the DB
             $this->createNewStockItem($supplierProduct, $markup);
+            $newCount++;
         }
 
         $this->entityManager->flush();
 
         $io = new SymfonyStyle($input, $output);
-        $io->success('It worked.');
+        $io->success("$existingCount existing item have been updated. $newCount items have been added.");
 
         return Command::SUCCESS;
     }
