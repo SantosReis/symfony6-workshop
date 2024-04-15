@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use App\Entity\StockItem;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Console\Command\Command;
@@ -20,10 +22,11 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class UpdateStockCommand extends Command
 {
     protected string $projectDir;
-    public function __construct($projectDir)
+    public function __construct($projectDir, EntityManagerInterface $entityManager)
     {
-        $this->projectDir = $projectDir;
         parent::__construct();
+        $this->projectDir = $projectDir;
+        $this->entityManager = $entityManager;
     }
 
     protected function configure(): void
@@ -37,18 +40,22 @@ class UpdateStockCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // dd($this->projectDir);
+        $processDate = $input->getArgument('process_date');
+
         //Convert csv file content into iterable php
-        $inputFile = $this->projectDir . '/public/supplier-inventory-files/2020-09-24.csv';
+        $supplierProducts = $this->getCsvRowsAsArrays($processDate);
+        // dd($supplierProducts);
 
-        $decoder = new Serializer([new ObjectNormalizer], [new CsvEncoder]);
-        $rows = $decoder->decode(file_get_contents($inputFile), 'csv');
-
-        dd($rows);
+        $stockItemRepo = $this->entityManager->getRepository(StockItem::class);
 
         //Loop over records
-        //Update if matching records found in db
-        //Create new records if matching records not found in the DB
+        foreach ($supplierProducts as $supplierProduct){
+            //Update IF matching records found in DB
+            $existingStockItem = $stockItemRepo->findBy(['itemNumber' => $supplierProduct['item_number']]);
+            dd($existingStockItem);
+            //Create new records if matching records not found in the DB
+        }
+
 
         // $io = new SymfonyStyle($input, $output);
         // $arg1 = $input->getArgument('arg1');
@@ -64,5 +71,12 @@ class UpdateStockCommand extends Command
         // $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
 
         // return Command::SUCCESS;
+    }
+
+    public function getCsvRowsAsArrays($processDate)
+    {
+        $inputFile = $this->projectDir . '/public/supplier-inventory-files/' . $processDate . '.csv';
+        $decoder = new Serializer([new ObjectNormalizer], [new CsvEncoder]);
+        return $decoder->decode(file_get_contents($inputFile), 'csv');
     }
 }
