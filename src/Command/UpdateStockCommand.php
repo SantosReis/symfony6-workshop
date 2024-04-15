@@ -49,39 +49,45 @@ class UpdateStockCommand extends Command
         $supplierProducts = $this->getCsvRowsAsArrays($processDate);
         // dd($supplierProducts);
 
-        /** var StockItemRepository $stockItemRepo  */
         $stockItemRepo = $this->entityManager->getRepository(StockItem::class);
 
         //Loop over records
         foreach ($supplierProducts as $supplierProduct){
             
             //Update IF matching records found in DB
-            /** var StockItem $existingStockItem  */
             if($existingStockItem = $stockItemRepo->findOneBy(['itemNumber' => $supplierProduct['item_number']])){
-                // dump($existingStockItem);
-                $existingStockItem->setSupplierCost($supplierProduct['cost']);
-                $existingStockItem->setPrice($supplierProduct['cost'] * $markup);
+                $this->updateStockItem($existingStockItem, $supplierProduct, $markup);
+                continue;
             }
 
-            // dd($existingStockItem);
             //Create new records if matching records not found in the DB
+            $this->createNewStockItem($supplierProduct, $markup);
         }
 
+        $this->entityManager->flush();
 
-        // $io = new SymfonyStyle($input, $output);
-        // $arg1 = $input->getArgument('arg1');
+        $io = new SymfonyStyle($input, $output);
+        $io->success('It worked.');
 
-        // if ($arg1) {
-        //     $io->note(sprintf('You passed an argument: %s', $arg1));
-        // }
+        return Command::SUCCESS;
+    }
 
-        // if ($input->getOption('option1')) {
-        //     // ...
-        // }
+    public function createNewStockItem($supplierProduct, $markup){
+        $newStockItem = new StockItem();
+        $newStockItem->setItemNumber($supplierProduct['item_number']);
+        $newStockItem->setItemName($supplierProduct['item_name']);
+        $newStockItem->setItemDescription($supplierProduct['description']);
+        $newStockItem->setSupplierCost($supplierProduct['cost']);
+        $newStockItem->setPrice($supplierProduct['cost'] * $markup);
+        $this->entityManager->persist($newStockItem);
+    }
 
-        // $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
-
-        // return Command::SUCCESS;
+    public function updateStockItem($existingStockItem, $supplierProduct, $markup)
+    {
+        // $existingStockItem = new StockItem();
+        $existingStockItem->setSupplierCost($supplierProduct['cost']);
+        $existingStockItem->setSupplierCost($supplierProduct['cost'] * $markup);
+        $this->entityManager->persist($existingStockItem);
     }
 
     public function getCsvRowsAsArrays($processDate)
