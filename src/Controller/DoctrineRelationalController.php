@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Address;
+use App\Entity\Category;
 use App\Entity\Contact;
 use App\Entity\Product;
 use App\Entity\Manufacturer;
@@ -75,6 +76,31 @@ class DoctrineRelationalController extends AbstractController
         $entityManager->flush();
 
         return new Response(sprintf('Address record created with id %d and User record created with id %d', $address->getId(), $contact->getId()));
+
+        // return $this->render('doctrine_relational/one-to-many-bidirectional.html.twig', [
+        //     'controller_name' => 'DoctrineRelationalController',
+        // ]);
+    }
+
+    #[Route('/doctrine/relational/one-to-many-self-joining', name: 'one_to_many_selfjoining')]
+    public function one_to_many_selfjoining(EntityManagerInterface $entityManager): Response
+    {
+        //insert into database
+        $parent = new Category();
+        $parent->setName('Parent 1');
+        $entityManager->persist($parent);
+        
+        $children = new Category();
+        $children->setName('Children 1');
+        $children->setParentCategory($parent);
+        $entityManager->persist($children);
+
+        // dump($parent);
+        // dd($children);
+
+        $entityManager->flush();
+
+        return new Response(sprintf('Parent Category record created with id %d and Child Category record created with id %d', $parent->getId(), $children->getId()));
 
         // return $this->render('doctrine_relational/one-to-many-bidirectional.html.twig', [
         //     'controller_name' => 'DoctrineRelationalController',
