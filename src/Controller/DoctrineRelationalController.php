@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Address;
+use App\Entity\Contact;
 use App\Entity\Product;
 use App\Entity\Manufacturer;
 use Doctrine\ORM\EntityManagerInterface;
@@ -48,6 +50,31 @@ class DoctrineRelationalController extends AbstractController
 
 
         return new Response(sprintf('Manufacturer record created with id %d', $manufacturer->getId()));
+
+        // return $this->render('doctrine_relational/one-to-many-bidirectional.html.twig', [
+        //     'controller_name' => 'DoctrineRelationalController',
+        // ]);
+    }
+
+
+    #[Route('/doctrine/relational/one-to-many-unidirectional', name: 'one_to_many_unidirectional')]
+    public function one_to_many_unidirectional(EntityManagerInterface $entityManager): Response
+    {
+        //insert into database
+        $address = new Address();
+        $address->setNumber(22);
+        $address->setStreet('Unter den Linden');
+        $entityManager->persist($address);
+
+        $contact = new Contact();
+        $contact->setAddress($address);
+        $entityManager->persist($address);
+
+        // dd($contact);
+
+        $entityManager->flush();
+
+        return new Response(sprintf('Address record created with id %d and User record created with id %d', $address->getId(), $contact->getId()));
 
         // return $this->render('doctrine_relational/one-to-many-bidirectional.html.twig', [
         //     'controller_name' => 'DoctrineRelationalController',
