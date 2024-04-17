@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Cart;
 use App\Entity\Address;
-use App\Entity\Category;
 use App\Entity\Contact;
 use App\Entity\Product;
+use App\Entity\Category;
+use App\Entity\Customer;
 use App\Entity\Manufacturer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -101,6 +103,30 @@ class DoctrineRelationalController extends AbstractController
         $entityManager->flush();
 
         return new Response(sprintf('Parent Category record created with id %d and Child Category record created with id %d', $parent->getId(), $children->getId()));
+
+        // return $this->render('doctrine_relational/one-to-many-bidirectional.html.twig', [
+        //     'controller_name' => 'DoctrineRelationalController',
+        // ]);
+    }
+
+    #[Route('/doctrine/relational/one-to-one', name: 'one_to_one')]
+    public function one_to_one(EntityManagerInterface $entityManager): Response
+    {
+        //insert into database
+        $customer = new Customer();
+        $customer->setName('Customer 1');
+        $entityManager->persist($customer);
+        
+        $cart = new Cart();
+        $cart->setCustomer($customer);
+        $entityManager->persist($cart);
+
+        // dump($customer);
+        // dd($cart);
+
+        $entityManager->flush();
+
+        return new Response(sprintf('Customer record created with id %d and Cart record created with id %d', $customer->getId(), $cart->getId()));
 
         // return $this->render('doctrine_relational/one-to-many-bidirectional.html.twig', [
         //     'controller_name' => 'DoctrineRelationalController',
