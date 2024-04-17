@@ -9,6 +9,7 @@ use App\Entity\Product;
 use App\Entity\Category;
 use App\Entity\Customer;
 use App\Entity\Manufacturer;
+use App\Entity\InterestGroup;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -127,6 +128,37 @@ class DoctrineRelationalController extends AbstractController
         $entityManager->flush();
 
         return new Response(sprintf('Customer record created with id %d and Cart record created with id %d', $customer->getId(), $cart->getId()));
+
+        // return $this->render('doctrine_relational/one-to-many-bidirectional.html.twig', [
+        //     'controller_name' => 'DoctrineRelationalController',
+        // ]);
+    }
+
+    #[Route('/doctrine/relational/many-to-many', name: 'many_to_many')]
+    public function manyToMany(EntityManagerInterface $entityManager): Response
+    {
+
+        $address = new Address();
+        $address->setNumber(22);
+        $address->setStreet('Alexanderplatz');
+        $entityManager->persist($address);
+
+        //insert into database
+        $interestGroup = new InterestGroup();
+        $interestGroup->setName('InterestGroup 1');
+        $entityManager->persist($interestGroup);
+        
+        $member = new Contact();
+        $member->setAddress($address);
+        $member->addInterestGroup($interestGroup);
+        $entityManager->persist($member);
+
+        // dump($interestGroup);
+        // dd($member);
+
+        $entityManager->flush();
+
+        return new Response(sprintf('InterestGroup id %d has joined to Contact id %d', $interestGroup->getId(), $member->getId()));
 
         // return $this->render('doctrine_relational/one-to-many-bidirectional.html.twig', [
         //     'controller_name' => 'DoctrineRelationalController',
