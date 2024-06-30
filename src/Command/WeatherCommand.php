@@ -13,6 +13,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+//sample symfony console app:weather 45.1 8.3 -d1 
+//sample symfony console app:weather 45.1 8.3 -d 1
+//sample symfony console app:weather 45.1 8.3 --days 3 
+//sample symfony console app:weather 45.1 8.3 --days=3 
 #[AsCommand(
     name: 'app:weather',
     description: 'Lists the weather of the given latitude and longitude',
