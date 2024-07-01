@@ -2,10 +2,27 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ApiResource(operations: [
+    new Get(
+        uriTemplate: '/product/{id}', 
+        requirements: ['id' => '\d+'], 
+        defaults: ['color' => 'brown'], 
+        options: ['my_option' => 'my_option_value'], 
+        schemes: ['https'], 
+        host: '{subdomain}.api-platform.com'
+    ),
+    new Post(
+        uriTemplate: '/product', 
+        status: 301
+    )
+])]
 class Product
 {
     #[ORM\Id]
